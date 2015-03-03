@@ -14,10 +14,8 @@ headers = {'content-type': 'application/json'}
 counter = 0
 eventsToResurface = set()
 
-# (importFile for importFile in os.listdir(folder_name) if (os.path.getsize(importFile) > 0):
 for importFile in os.listdir(folder_name):
 	if os.path.getsize(folder_name+"/"+importFile) == 0:
-		# print "no!"
 		continue
 	print importFile
 	f = open(folder_name+"/"+importFile, "rU")
@@ -27,9 +25,9 @@ for importFile in os.listdir(folder_name):
 	del data["options"]["providers"]
 	payload = {}
 	payload["batch"] = []
-	payload["batch"].append(data)#json.loads(data))
+	payload["batch"].append(data)
 	try:
-		eventsToResurface.add(data["event"])#(json.loads(data)["event"])
+		eventsToResurface.add(data["event"])
 	except:
 		pass
 	payload = json.dumps(payload)
@@ -39,7 +37,6 @@ for importFile in os.listdir(folder_name):
 	r = requests.post("https://api.segment.io/v1/import", data=payload, headers=headers, auth=(write_key, ''))
 	print r.status_code
 	print r.content
-	# print eventsToResurface
 
 decision = raw_input("Resurface these events in the project? (Y/N) (This WILL send actual events to your project!)  ")
 

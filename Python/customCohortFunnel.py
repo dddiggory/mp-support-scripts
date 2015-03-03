@@ -1,6 +1,6 @@
 import json
 
-file = "xbj"
+file = ""
 
 f = open(file, "rU")
 
