@@ -1,3 +1,6 @@
+"""User-friendly Stream/Query exports. Extremely useful for
+viewing a user's realtime events very quickly.
+"""
 import time
 import urllib
 import md5

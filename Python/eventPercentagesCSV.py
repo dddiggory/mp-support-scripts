@@ -1,3 +1,8 @@
+"""CSM-requested script. Provides a CSV of events with counts,
+percentages, and existing property keys. Useful for customers who are
+watching their usage and want to know if an event is firing more than
+anticipated.
+"""
 import json
 import requests
 import urllib

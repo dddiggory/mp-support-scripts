@@ -1,3 +1,12 @@
+"""Imports Segment.com-formattted data to a Segment.com project, 
+which can subsequently pipe the imported data into Mixpanel.
+
+Be sure to 'pip install mixpanel-py' in your terminal before running 
+this script, as it relies on the Mixpanel Python library to complete
+the 'resurface' step at the end.
+
+This version still needs to be 'genericized'.
+"""
 import json
 import requests
 import os

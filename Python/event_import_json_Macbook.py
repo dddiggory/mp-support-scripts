@@ -1,7 +1,11 @@
-"""
-This is a Macbook-safe version of the Event_Import_Json.py script. The Eventlet behavior within the 'batch_update' function is built for high bandwidth dev boxes, and can *drop* events when run with limited memory or over a less-than-stellar connection.
+"""This is a Macbook-safe version of the Event_Import_Json.py script.
+The Eventlet behavior within the 'batch_update' function is built for
+high bandwidth dev boxes, and can *drop* events when run with limited
+memory or over a less-than-stellar connection.
 
-This script includes a pool.waitall() function to effectively disable eventlet's batching behavior. It's slower, but will reliably send every event in the import file.
+Specifically, this script includes a pool.waitall() function to 
+effectively disable eventlet's batching behavior. It's slower, but 
+will reliably send every event in the import file.
 """
 
 import json

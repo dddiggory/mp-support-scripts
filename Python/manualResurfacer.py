@@ -1,6 +1,11 @@
-# Be sure to 'pip install mixpanel-py' in your terminal before running this script. If you haven't installed Pip: https://pypi.python.org/pypi/pip
-import mixpanel
+"""A manual resurfacer that just sends precisely the Event, 
+Properties, and Property Values you seek to resurface. 
+Be sure to 'pip install mixpanel-py' in your terminal before running 
+this script, as it relies on the Mixpanel Python library to send
+events.
 
+If you haven't installed Pip: https://pypi.python.org/pypi/pip
+"""
 from mixpanel import Mixpanel
 
 PROJECT_TOKEN = raw_input("Project Token: ")

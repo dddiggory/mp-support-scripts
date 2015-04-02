@@ -1,3 +1,7 @@
+"""
+Create a custom event via the API! The customer's use case was to create a Custom Event 
+that included an event/property that went beyond the UI's dropdown limits.
+"""
 import time
 import urllib
 import md5
@@ -7,6 +11,9 @@ import json
 expire = int(time.time()) + 1000
 
 def make_sig(raw_url):
+	"""Take a raw URL, formulate a sig, and return the new 
+	complete URL.
+	"""
 	url = urllib.unquote(raw_url).decode('utf8')
 	url = url.replace("+"," ")
 	args = url.split("?")[1].split("&")
@@ -20,6 +27,7 @@ def make_sig(raw_url):
 	return raw_url + "&sig=" + sig
 
 def collect_events():
+	"""Collect events from the user."""
 	addMore = True
 	alternatives = []
 	while addMore:
@@ -36,6 +44,9 @@ def collect_events():
 	return alternatives
 
 def create_custom_event():
+	"""Send an API request that creates a custom event based on 
+	the user's input.
+	"""
 	root = "https://mixpanel.com/api/2.0/custom_events/create/"
 	URL = "%s?expire=%d&api_key=%s&name=%s&alternatives=%s" % (root, expire, api_key, name, alternatives)
 	URL = make_sig(URL)
@@ -44,9 +55,9 @@ def create_custom_event():
 	response = requests.post(URL).text
 	return response
 
-api_key = "3b117b22cd31c800465239af00a778c5" #raw_input("Enter API Key:  ")
-api_secret = "2b1c88c6b8e6fc397b1928d36e6c0a4d" #raw_input("Enter API Secret:  ")
-token = "68436c8f473803cf42dfc1c554a82149" #raw_input("Enter Project Token:  ")
+api_key = raw_input("Enter API Key:  ")
+api_secret = raw_input("Enter API Secret:  ")
+token = raw_input("Enter Project Token:  ")
 name = raw_input("What would you like to call the custom event?  ")
 
 alternatives = collect_events()

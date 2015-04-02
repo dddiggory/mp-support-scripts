@@ -1,3 +1,10 @@
+"""An offline funnel report for a 19GB of customer data. Depicts 
+conversion rates for any of 4 "engagement events" as well as a 
+sequence-agnostic custom event with an "AND" comparison rather than 
+"OR", which represents a "Fully Engaged" user. Also, segments on an
+experimental group property.
+"""
+
 import json
 
 file = ""
@@ -119,7 +126,6 @@ step3Template = len(Feature_Template)
 step3FeatureReminder = len(Feature_Reminder)
 step3SendLater = len(Feature_SendLater)
 step3Referral = len(Feature_Referral)
-
 
 print "Step 1: %d" % (StartedTrialCount)
 print "Step 2 (Control): %d (%s%%)" % (len(InboxDashboard["Control"]), (str(100*float(len(InboxDashboard["Control"]))/float(StartedTrialCount)))[:5])
