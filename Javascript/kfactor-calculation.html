@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
+		<link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
+		<script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
+		<title>Mixpanel Platform</title>
+	</head>
+	<body class="mixpanel-platform-body">
+
+		<h1><font size="18">K-Factor!</font></h1>
+		Sample populated output: <a href="http://note.io/1ysDTHb">Click Here</a>
+		
+		<img src="http://upload.wikimedia.org/math/2/0/2/20215a64b5e9d1a70e1f23d182efc120.png"/><br>
+		<img src="http://upload.wikimedia.org/math/d/b/a/dba3b55cb7520ba711e9ad384ae7aff7.png"/><br>
+		<img src="http://upload.wikimedia.org/math/4/1/0/41083d2dae849c2c95c2440ffa7f375e.png"/><br>
+
+		<div id="datePicker"></div>
+		<br><br>
+		<div id="dataTable"></div>
+
+		<script>
+
+			MP.api.setCredentials('API KEY', 'API SECRET')
+
+			
+
+      		$(document).ready(function() {
+
+      			var kData = {}
+
+      			var dateSelector = $('#datePicker').MPDatepicker();    // Create a date picker
+      			var dateTo = dateSelector.MPDatepicker('value').to;
+      			var dateFrom = dateSelector.MPDatepicker('value').from,
+      			    mpTable = $('#dataTable').MPTable({firstColHeader: "Month"});
+
+
+      			function createGraph() {
+					MP.api.segment('Invite Sent', undefined, {type: 'average', unit: 'month', from: dateFrom, to: dateTo}).done(function(sentResults) {
+
+						var sentAvg = sentResults.values()["Invite Sent"]
+
+						MP.api.segment('Invite Accepted', undefined, {type: 'general', unit: 'month', from: dateFrom, to: dateTo}).done(function(acceptedResults) {
+							
+							var acceptedData = acceptedResults.values()["Invite Accepted"]
+							
+								MP.api.segment('Invite Sent', undefined, {type: 'general', unit: 'month', from: dateFrom, to: dateTo}).done(function(sentTotalResults) {
+
+									var sentTotal = sentTotalResults.values()["Invite Sent"]
+
+									for (var date in sentAvg) {
+										var sentAvgForTable = sentAvg[date]
+										var acceptedForTable = acceptedData[date]
+										var sentForTable = sentTotal[date]
+
+										console.log(date)
+										console.log("Avg Sent Per User: " + sentAvgForTable)
+										console.log("Total Accepted: " + acceptedForTable)
+										console.log("Total Sent: " + sentForTable)
+										var kCalc = ((acceptedForTable / sentForTable))*sentAvgForTable
+										console.log(kCalc)
+
+										kData[date] = {"Invites Per Customer": sentAvgForTable, "Total Sent": sentForTable, "Total Accepted": acceptedForTable, "K-Factor Score": kCalc}
+									}
+
+									mpTable.MPTable('setData', kData)
+								})
+						})
+					})
+				}
+
+      			createGraph();
+
+      			dateSelector.on('change', function(e, dates) {
+      				dateTo = dateSelector.MPDatepicker('value').to
+      				dateFrom = dateSelector.MPDatepicker('value').from
+      				createGraph();
+      			})
+
+
+      		})
+			
+
+		  
+		</script>
+  	</body>
+</html>

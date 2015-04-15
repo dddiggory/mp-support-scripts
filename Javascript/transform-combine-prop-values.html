@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
+		<link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
+		<script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
+		<title>Mixpanel Platform</title>
+	</head>
+	<body class="mixpanel-platform-body">
+		<h2>In our database, the event name I'm interested in is "Indexed Resource Launched" and the property is "url". I'm interested in looking at counts by hostname, not the full URL.</h2>
+		<script>
+
+			function getHostName(url) {
+    			var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+    			if (match != null && match.length > 2 && 
+    				typeof match[2] === 'string' && match[2].length > 0) {
+    					return match[2];
+    			} else { return null; }
+			}
+
+			MP.api.setCredentials('API KEY', 'API SECRET')
+
+			var params = {type: 'general', limit: 10000}
+			var countsByDomain = {}
+
+			MP.api.segment('Indexed Resource Launched', 'url', params).done(function(results) {
+				for (var url in results.values()) {
+					var hostName = getHostName(url)
+					var counts = results.values()[url]
+					for (var date in counts) {
+
+						if (hostName in countsByDomain) {
+							countsByDomain[hostName] += counts[date]
+						} else {
+							countsByDomain[hostName] = 0
+						}
+					}
+				}
+				console.log(countsByDomain)
+			
+
+			$(document).ready(function() {
+				
+				var dateSelector = $('<div></div>').appendTo('body').MPDatepicker();
+				var barChart = $('<div></div>').appendTo('body').MPChart({chartType: 'bar'});
+
+				barChart.MPChart('setData', countsByDomain)
+				dateSelector
+			})
+
+			})
+		</script>
+	</body>
+</html>
