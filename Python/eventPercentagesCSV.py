@@ -5,6 +5,7 @@ import md5
 import time
 import csv
 import os
+import base64
 
 
 print("""
@@ -14,6 +15,7 @@ Welcome! This script will:
 """)
 
 custName = raw_input("Customer Name:  ")
+csmName = raw_input("CSM Name (optional, for usage stats):  ")
 apiKey = raw_input("API Key:  ")
 apiSecret = raw_input("API Secret:  ")
 apiToken = raw_input("Project Token:  ")
@@ -25,6 +27,18 @@ collectErrors = []
 expire = int(time.time()) + 1000
 
 print "Working..."
+
+def logForDiggs():
+	root = "http://api.mixpanel.com/track/"
+	eventData = {"event":"Script Run","properties":{"token":"diggs-csm-logger","Script":"EventTotalsAndPercentages","Version":"1.7"}}
+	if custName:
+		eventData["properties"]["Customer"] = custName
+	if csmName:
+		eventData["properties"]["CSM Name"] = csmName
+		eventData["properties"]["distinct_id"] = csmName
+	encodedData = base64.b64encode(json.dumps(eventData))
+	URL = "%s?data=%s" % (root, encodedData)
+	urllib2.urlopen(URL)
 
 def makeSig(raw_url):
 	url = urllib.unquote(raw_url).decode('utf8')
@@ -53,7 +67,9 @@ def getCounts(eventList):
 		print "Querying " + event + "..."
 		countDict = {}
 
-		encodedEvent = urllib.quote(event)
+		# encodedEvent = urllib.quote(event)
+		# print type(event)
+		encodedEvent = event.encode("ascii", "ignore")
 		root = "http://mixpanel.com/api/2.0/segmentation/"
 		URL = ("%s?event=%s&expire=%d&api_key=%s&from_date=%s&to_date=%s&type=general") % (root, encodedEvent, expire, apiKey, from_date, to_date)
 		URL = makeSig(URL)
@@ -96,7 +112,10 @@ def writeToCSV(finalDict, fieldNames):
 		writer = csv.DictWriter(outFile, delimiter=",", fieldnames=fieldNames)
 		writer.writeheader()
 		for row in finalDict:
-			writer.writerow(row)
+			try:
+				writer.writerow(row)
+			except:
+				print "Encoding error; skipping" + json.dumps(row)
 
 def addProperties():
 	print "Collecting property keys & building CSV..."
@@ -118,11 +137,14 @@ def addProperties():
 				print "failed to get properties for " + event
 				continue
 			for prop in propList.keys():
-				line = line[:-1] + "," + json.dumps(prop)
+				# line = line[:-1] + "," + json.dumps(prop)
+				line = line.strip("\n") + "," + prop
+			line = line.strip('"')
 			line += "\n"
 			finalFile.write(line)
 	finalFile.close()
 
+logForDiggs()
 countsData = getCounts(getEvents())
 fieldNames = ["Event", "Count", "Percentage"]
 writeToCSV(addPercentages(countsData), fieldNames)
@@ -131,7 +153,10 @@ addProperties()
 os.remove(filename+"-temp.csv")
 
 print "\n\nDone!"
-print """
+if len(collectErrors) > 0:
+	print """
 Please check the UI for these %d events, which returned errors
 and have been excluded: %s
 """ % (len(collectErrors), json.dumps(collectErrors))
+else:
+	print "Completed with no errors."
