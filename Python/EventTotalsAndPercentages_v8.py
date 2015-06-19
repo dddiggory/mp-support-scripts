@@ -30,7 +30,7 @@ print "Working..."
 
 def logForDiggs():
 	root = "http://api.mixpanel.com/track/"
-	eventData = {"event":"Script Run","properties":{"token":"diggs-csm-logger","Script":"EventTotalsAndPercentages","Version":"1.7"}}
+	eventData = {"event":"Script Run","properties":{"token":"diggs-csm-logger","Script":"EventTotalsAndPercentages","Version":"1.8"}}
 	if custName:
 		eventData["properties"]["Customer"] = custName
 	if csmName:
@@ -76,8 +76,10 @@ def getCounts(eventList):
 		
 
 		try:
-			response = json.loads(urllib2.urlopen(URL).read())
-		except:
+			response = json.loads(urllib.urlopen(URL).read())
+		except Exception,e:
+			print str(e)
+			print urllib2.urlopen(URL).read()
 			print "ERROR: Failed on " + event + "."
 			print URL
 			collectErrors.append(event)
@@ -132,7 +134,7 @@ def addProperties():
 			URL = ("%s?event=%s&expire=%d&api_key=%s&limit=20") % (root, event, expire, apiKey)
 			URL = makeSig(URL)
 			try:
-				propList = json.loads(urllib2.urlopen(URL).read())
+				propList = json.loads(urllib.urlopen(URL).read())
 			except:
 				print "failed to get properties for " + event
 				continue
